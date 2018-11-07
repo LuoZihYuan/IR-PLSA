@@ -1,32 +1,38 @@
 # dev_dependencies
+from tqdm import tqdm
 from sys import getsizeof
 # dependencies
 import gc
 from collections import Counter
 import numpy as np
 
-TOPIC_SIZE = 10
+TOPIC_SIZE = 256
 LEXICON_SIZE = 51253
 COLLECTION_SIZE = 18461
 
 def m_step(collection: list, p_wt: np.ndarray, p_td: np.ndarray):
   old_wt = p_wt.copy(); old_td = p_td.copy()
 
-  p_wt_devider = np.zeros((old_wt.shape[1], 1), dtype=float)
-  for k in range(old_wt.shape[1]):
-    for i_prime in range(old_wt.shape[0]):
+  p_wt_devisor = np.zeros(old_wt.shape[1], dtype=float)
+  p_wt_dividend = np.zeros(old_wt.shape, dtype=float)
+  for i_prime in tqdm(range(old_wt.shape[0])):
+  # for i_prime in range(old_wt.shape[0]):
 
-      # C(Wi', dj), dj(D
-      word = str(i_prime)
-      c_wd = np.zeros((1, len(collection)), dtype=int)
-      for j in range(len(collection)):
-        c_wd[0][j] = collection[j][word]
+    # C(Wi', dj), dj(D
+    word = str(i_prime)
+    c_wd = np.zeros((1, len(collection)), dtype=int)
+    for j in range(len(collection)):
+      c_wd[0][j] = collection[j][word]
 
-      # P(Tk|Wi', dj), dj(D
-      p_twd_devider = np.dot(old_wt[i_prime], old_td.T)
-      # print(p_twd_devider.shape)
-      # print(p_twd_devider)
+    # P(Tk|Wi', dj), dj(D
+    p_twd_devisor = np.dot(old_wt[i_prime], old_td.T)
+    p_twd_devidend = old_wt[i_prime] * old_td
+    p_twd = (p_twd_devidend.T / p_twd_devisor).T
+    sum_cp_d = np.dot(c_wd, p_twd)[0]
+    # sum_cp_v =
+    p_wt_devisor += sum_cp_d
 
+  p_wt = p_wt_dividend / p_wt_devisor
   # for i in range(p_wt.shape[0]):
 
 
