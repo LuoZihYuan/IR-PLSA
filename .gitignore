@@ -6,3 +6,6 @@ BGLM.txt
 Collection.txt
 Document/
 Query/
+
+# Numpy
+*.npz
