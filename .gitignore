@@ -2,10 +2,10 @@
 .vscode/
 
 # DataSet
-BGLM.txt
-Collection.txt
-Document/
-Query/
+resources/BGLM.txt
+resources/Collection.txt
+resources/Document
+resources/Query
 
 # Numpy
-*.npz
+temp/*.npz

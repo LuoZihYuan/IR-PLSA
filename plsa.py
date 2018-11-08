@@ -6,7 +6,7 @@ TOPIC_SIZE = 256
 LEXICON_SIZE = 51253
 COLLECTION_SIZE = 18461
 
-def m_step(collection: list, p_wt: np.ndarray, p_td: np.ndarray) -> (np.ndarray, np.ndarray):
+def em(collection: list, p_wt: np.ndarray, p_td: np.ndarray) -> (np.ndarray, np.ndarray):
   # P(Wi|Tk)
   p_wt_devisor = np.zeros(p_wt.shape[1], dtype=np.longdouble) # (TOPIC_SIZE,)
   p_wt_devidend = np.zeros(p_wt.shape, dtype=np.longdouble) # (51253, TOPIC_SIZE)
@@ -64,7 +64,7 @@ def filecheck(f: np.lib.npyio.NpzFile) -> bool:
 
 def main(npzout: str, npzin: str=None):
   collection = []
-  with open("./Collection.txt") as fileinput:
+  with open("./resources/Collection.txt") as fileinput:
     for row in fileinput:
       collection.append(Counter(row.split()))
 
@@ -78,7 +78,7 @@ def main(npzout: str, npzin: str=None):
     p_td = npzfile["p_td"]
 
   for _ in range(5):
-    p_wt, p_td = m_step(collection, p_wt, p_td)
+    p_wt, p_td = em(collection, p_wt, p_td)
     np.savez(npzout, p_wt=p_wt, p_td=p_td)
 
   # with open("./BGLM.txt") as fileinput:
