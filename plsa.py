@@ -2,7 +2,7 @@ from collections import Counter
 from tqdm import tqdm
 import numpy as np
 
-TOPIC_SIZE = 256
+TOPIC_SIZE = 10
 LEXICON_SIZE = 51253
 COLLECTION_SIZE = 18461
 
@@ -90,7 +90,7 @@ if __name__ == "__main__":
   import os.path
   from datetime import datetime
   assert len(sys.argv) <= 2
-  npzout = datetime.now().strftime("%Y%m%d-%H%M%S") + ".npz"
+  npzout = "temp/" + datetime.now().strftime("%Y%m%d-%H%M%S") + ".npz"
   if len(sys.argv) == 1:
     main(npzout)
   else:
