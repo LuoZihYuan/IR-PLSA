@@ -1,5 +1,4 @@
 from collections import Counter
-from datetime import datetime
 from tqdm import tqdm
 import numpy as np
 
@@ -9,8 +8,8 @@ COLLECTION_SIZE = 18461
 
 def m_step(collection: list, p_wt: np.ndarray, p_td: np.ndarray) -> (np.ndarray, np.ndarray):
   # P(Wi|Tk)
-  p_wt_devisor = np.zeros(p_wt.shape[1], dtype=float) # (TOPIC_SIZE,)
-  p_wt_devidend = np.zeros(p_wt.shape, dtype=float) # (51253, TOPIC_SIZE)
+  p_wt_devisor = np.zeros(p_wt.shape[1], dtype=np.longdouble) # (TOPIC_SIZE,)
+  p_wt_devidend = np.zeros(p_wt.shape, dtype=np.longdouble) # (51253, TOPIC_SIZE)
   for i_prime in tqdm(range(p_wt.shape[0])):
 
     # C(Wi', dj) -> dj(D
@@ -32,8 +31,8 @@ def m_step(collection: list, p_wt: np.ndarray, p_td: np.ndarray) -> (np.ndarray,
   new_wt = p_wt_devidend / p_wt_devisor
 
   # P(Tk|dj)
-  p_td_devisor = np.zeros(len(collection), dtype=float) # (18461,)
-  p_td_devidend = np.zeros(p_td.shape, dtype=float) # (18461, TOPIC_SIZE)
+  p_td_devisor = np.zeros(len(collection), dtype=np.longdouble) # (18461,)
+  p_td_devidend = np.zeros(p_td.shape, dtype=np.longdouble) # (18461, TOPIC_SIZE)
   for j in tqdm(range(p_td.shape[0])):
 
     # C(Wi', dj) -> i=1~|V|
@@ -58,32 +57,29 @@ def m_step(collection: list, p_wt: np.ndarray, p_td: np.ndarray) -> (np.ndarray,
 def filecheck(f: np.lib.npyio.NpzFile) -> bool:
   if f["p_wt"].shape == (LEXICON_SIZE, TOPIC_SIZE) and \
      f["p_td"].shape == (COLLECTION_SIZE, TOPIC_SIZE):
+    print(f["p_wt"])
+    print(f["p_td"])
     return True
   return False
 
-def main(npzfilename: str=None):
+def main(npzout: str, npzin: str=None):
   collection = []
   with open("./Collection.txt") as fileinput:
     for row in fileinput:
       collection.append(Counter(row.split()))
 
-  if npzfilename is None:
-    p_wt = np.random.dirichlet(np.ones(LEXICON_SIZE, dtype=float), size=TOPIC_SIZE).T
-    p_td = np.random.dirichlet(np.ones(COLLECTION_SIZE, dtype=float), size=TOPIC_SIZE).T
+  if npzin is None:
+    p_wt = np.random.dirichlet(np.ones(LEXICON_SIZE, dtype=np.float64), size=TOPIC_SIZE).T
+    p_td = np.random.dirichlet(np.ones(COLLECTION_SIZE, dtype=np.float64), size=TOPIC_SIZE).T
   else:
-    npzfile = np.load(npzfilename)
+    npzfile = np.load(npzin)
     assert filecheck(npzfile)
     p_wt = npzfile["p_wt"]
     p_td = npzfile["p_td"]
 
-  try:
-    for index in range(5):
-      p_wt, p_td = m_step(collection, p_wt, p_td)
-    index += 1
-  finally:
-    if index > 0:
-      filename = datetime.now().strftime("%Y%m%d-%H%M%S")
-      np.savez(filename + ".npz", p_wt=p_wt, p_td=p_td)
+  for _ in range(5):
+    p_wt, p_td = m_step(collection, p_wt, p_td)
+    np.savez(npzout, p_wt=p_wt, p_td=p_td)
 
   # with open("./BGLM.txt") as fileinput:
   #   content = fileinput.read().split()
@@ -92,9 +88,11 @@ def main(npzfilename: str=None):
 if __name__ == "__main__":
   import sys
   import os.path
+  from datetime import datetime
   assert len(sys.argv) <= 2
+  npzout = datetime.now().strftime("%Y%m%d-%H%M%S") + ".npz"
   if len(sys.argv) == 1:
-    main()
+    main(npzout)
   else:
     assert os.path.isfile(sys.argv[1])
-    main(sys.argv[1])
+    main(npzout, sys.argv[1])
