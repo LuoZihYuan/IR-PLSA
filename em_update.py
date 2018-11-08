@@ -81,10 +81,6 @@ def main(npzout: str, npzin: str=None):
     p_wt, p_td = em(collection, p_wt, p_td)
     np.savez(npzout, p_wt=p_wt, p_td=p_td)
 
-  # with open("./BGLM.txt") as fileinput:
-  #   content = fileinput.read().split()
-  # BGLM = np.array(content[1::2])
-
 if __name__ == "__main__":
   import sys
   import os.path
