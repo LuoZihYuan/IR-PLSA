@@ -16,7 +16,9 @@ def em(collection: list, p_wt: cp.ndarray, p_td: cp.ndarray) -> (cp.ndarray, cp.
 
     # C(Wi', dj) -> dj(D
     word = str(i_prime)
-    c_wd = [[collection[j][word] for j in range(len(collection))]]
+    c_wd = np.zeros((1, len(collection)), dtype=int)
+    for j in range(len(collection)):
+      c_wd[0][j] = collection[j][word]
 
     # P(Tk|Wi', dj) -> dj(D
     p_twd_devisor = cp.dot(p_wt[i_prime], p_td.T)
@@ -60,7 +62,9 @@ def log_likelihood(collection: list, p_wt: cp.ndarray, p_td: cp.ndarray) -> floa
   for i in tqdm(range(p_wt.shape[0]), desc='Log_like'):
     # C(Wi', dj) -> dj(D
     word = str(i)
-    c_wd = [collection[j][word] for j in range(len(collection))]
+    c_wd = cp.zeros(len(collection), dtype=int)
+    for j in range(len(collection)):
+      c_wd[j] = collection[j][word]
 
     # P(Wi|Tk)P(Tk|dj) -> k=1~K
     sum_pp_k = cp.dot(p_wt[i], p_td.T)
