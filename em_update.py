@@ -53,7 +53,7 @@ def em(collection: list, p_wt: np.ndarray, p_td: np.ndarray) -> (np.ndarray, np.
       p_td_devidend[j] = sum_cp_v
     new_td = (p_td_devidend.T / p_td_devisor).T
 
-    return new_wt, new_td
+  return new_wt, new_td
 
 def log_likelihood(collection: list, p_wt: np.ndarray, p_td: np.ndarray) -> float:
 
