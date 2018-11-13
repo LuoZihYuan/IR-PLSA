@@ -79,6 +79,9 @@ def filecheck(f: np.lib.npyio.NpzFile) -> bool:
     return True
   return False
 
+def normalize(cparray: cp.ndarray, axis=-1) -> cp.ndarray:
+  return cparray / cparray.sum(axis=axis, keepdims=True)
+
 def main(npzout: str, npzin: str=None):
   collection = []
   with open("./resources/Collection.txt") as fileinput:
@@ -86,8 +89,8 @@ def main(npzout: str, npzin: str=None):
       collection.append(Counter(row.split()))
 
   if npzin is None:
-    p_wt = cp.random.dirichlet(cp.ones(LEXICON_SIZE, dtype=float), size=TOPIC_SIZE).T
-    p_td = cp.random.dirichlet(cp.ones(COLLECTION_SIZE, dtype=float), size=TOPIC_SIZE).T
+    p_wt = normalize(cp.random.rand(LEXICON_SIZE, TOPIC_SIZE), axis=0)
+    p_td = normalize(cp.random.rand(COLLECTION_SIZE, TOPIC_SIZE), axis=0)
   else:
     npzfile = cp.load(npzin)
     assert filecheck(npzfile)
