@@ -2,9 +2,10 @@ from collections import Counter
 from tqdm import tqdm
 import numpy as np
 
-TOPIC_SIZE = 10
+TOPIC_SIZE = 256
 LEXICON_SIZE = 51253
 COLLECTION_SIZE = 18461
+UPDATE_THRESHOLD = 1e-4
 
 def em(collection: list, p_wt: np.ndarray, p_td: np.ndarray) -> (np.ndarray, np.ndarray):
   # P(Wi|Tk)
@@ -94,11 +95,15 @@ def main(npzout: str, npzin: str=None):
 
   baseline_likelihood = log_likelihood(collection, p_wt, p_td)
   print("likelihood(baseline): %f" %(baseline_likelihood))
-  for index in range(5):
+  prev_likelihood = baseline_likelihood
+  for index in range(1000):
     p_wt, p_td = em(collection, p_wt, p_td)
     np.savez(npzout, p_wt=p_wt, p_td=p_td)
     likelihood = log_likelihood(collection, p_wt, p_td)
     print("likelihood(%d): %f" %(index+1, likelihood))
+    if (likelihood - prev_likelihood) / abs(prev_likelihood) < UPDATE_THRESHOLD:
+      break
+    prev_likelihood = likelihood
 
 if __name__ == "__main__":
   import sys
