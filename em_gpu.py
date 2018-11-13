@@ -1,6 +1,7 @@
 from collections import Counter
 from tqdm import tqdm
 import cupy as cp
+import numpy as np
 
 TOPIC_SIZE = 256
 LEXICON_SIZE = 51253
@@ -70,7 +71,7 @@ def log_likelihood(collection: list, p_wt: cp.ndarray, p_td: cp.ndarray) -> floa
 
   return likelihood
 
-def filecheck(f: cp.lib.npyio.NpzFile) -> bool:
+def filecheck(f: np.lib.npyio.NpzFile) -> bool:
   if f["p_wt"].shape == (LEXICON_SIZE, TOPIC_SIZE) and \
      f["p_td"].shape == (COLLECTION_SIZE, TOPIC_SIZE):
     print(f["p_wt"])
